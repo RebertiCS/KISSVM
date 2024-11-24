@@ -1,0 +1,15 @@
+image: "archlinux:latest"
+
+before_script:
+  - pacman --noconfirm -Syu make gcc bash git sudo fakeroot
+
+Building:
+  script:
+  - make clean
+  - make DEBUG=1
+
+Testing:
+  script:
+  - make
+  - ./build/asvm -v -f programs/piramid.asvm
+  - ./build/asvm -v -f programs/call_ret_test.asvm

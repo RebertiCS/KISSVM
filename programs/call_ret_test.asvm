@@ -1,0 +1,21 @@
+CALL _start
+
+there:
+PRINTC 32
+PRINTS THERE
+RET
+
+here:
+PUSHA
+PRINTS HERE
+
+CALL there
+
+PRINTC 11
+PRINTC 13
+
+POPA
+RET
+
+_start:
+CALL here

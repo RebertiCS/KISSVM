@@ -1,0 +1,21 @@
+CALL _start
+
+PRINT_FILE:
+	PUSHA
+PRINT_LOOP: 			; Read and print the content of the file ;
+	READ $RAX, $RBX
+	PRINTC $RBX
+
+	CMP $RBX, 0
+	JNE PRINT_LOOP
+
+	PRINTC 11
+	PRINTC 13
+
+	POPA
+	RET
+
+_start: 			; The start of the program ;
+	OPEN $RAX, ./programs/cat.asvm
+	CALL PRINT_FILE
+	CLOSE $RAX

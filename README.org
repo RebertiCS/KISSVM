@@ -1,0 +1,103 @@
+* ASVM
+An intel assembly alike interpreter that uses a virtualized x86_64 CPU.
+
+** Program Options
+kissvm -f =<file_name>=
+
+=-V=, Verbose Mode.
+
+=-f= <file_name>, the file that should be used.
+
+** Building & Running
+Building the project:
+#+BEGIN_SRC sh
+make # you can use DEBUG=1 to enable debuggin
+#+END_SRC
+
+Running:
+#+BEGIN_SRC sh
+./build/kissvm -f <file_name>
+#+END_SRC
+** The Language
+The language fallows the logic behind the intel assembly syntax, that being
+the first word will be the instruction to executed and the next ones the target(s),
+if the instruction has more than one argument then the first argument is the target
+and the second the value.
+
+The data types are four:
+- Registers, that are prepended with the symbol =$=.
+- Variables, that are prepended with the symbol =#=.
+- Labels, that are ended with the symbol =:=.
+- Numbers, aren't prepended with any symbol.
+  
+To write coments start and end the comment with a =;=
+#+begin_src asm
+_start: ; This is the start of the program ;
+#+end_src
+
+*** Examples:
+**** One argument:
+Move the value of the register =RAX= to the cpu stack
+#+BEGIN_SRC asm
+ PUSH $RAX
+#+END_SRC
+
+**** Two arguments:
+This instruction moves the value =10= to the register =RAX=.
+#+BEGIN_SRC asm
+MOVE $RAX, 10
+#+END_SRC
+
+This instruction compares the value of =10= and =RAX=.
+#+BEGIN_SRC asm
+CMP $RAX, 10
+#+END_SRC
+**** A basic program:
+This program should print the alphabet.
+#+BEGIN_SRC asm
+MOVE #A, 64
+MOVE #Z, 90
+
+INC #A
+PRINTC #A
+
+CMP #A, #Z
+JGT 2
+#+END_SRC
+
+*** Instruction Set
+Aways check =exec_inst= in the source code for the updated instruction set.
+| instruction | Argc | Exec Function    |
+| =MOVE=      |    2 | &exec_move       |
+| =PUSH=      |    1 | &exec_push       |
+| =POP=       |    1 | &exec_pop        |
+| =PUSHA=     |    0 | &exec_pusha      |
+| =POPA=      |    0 | &exec_popa       |
+| =ADD=       |    2 | &exec_math       |
+| =SUB=       |    2 | &exec_math       |
+| =MUL=       |    2 | &exec_math       |
+| =DIV=       |    2 | &exec_math       |
+| =INC=       |    1 | &exec_inc        |
+| =DEC=       |    1 | &exec_dec        |
+| =CMP=       |    2 | &exec_cmp        |
+| =JMP=       |    1 | &exec_jmp_prefix |
+| =JEQ=       |    1 | &exec_jmp_prefix |
+| =JNE=       |    1 | &exec_jmp_prefix |
+| =JLT=       |    1 | &exec_jmp_prefix |
+| =JLE=       |    1 | &exec_jmp_prefix |
+| =JGT=       |    1 | &exec_jmp_prefix |
+| =JGE=       |    1 | &exec_jmp_prefix |
+| =CALL=      |    1 | &exec_call       |
+| =RET=       |    0 | &exec_ret        |
+| =PRINTD=    |    1 | &exec_print      |
+| =PRINTC=    |    1 | &exec_print      |
+| =PRINTS=    |    1 | &exec_print      |
+| =OPEN=      |    2 | &exec_open       |
+| =READ=      |    2 | &exec_read       |
+| =WRITE=     |    2 | &exec_write      |
+| =CLOSE=     |    1 | &exec_close      |
+
+Generate Table from source code.
+#+BEGIN_SRC sh
+grep '&exec' src/exec.c | sed -E 's/(\{|\}?,)/ \|/g;s/\"/=/g'
+#+END_SRC
